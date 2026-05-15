@@ -20,7 +20,7 @@ def test_skill_frontmatter_is_valid():
     assert fm["name"] == "autorunne-grill"
     assert "description" in fm
     assert len(fm["description"]) <= 1024
-    assert fm["version"] == "0.1.0"
+    assert fm["version"] == "0.1.1"
     assert len(content) <= 100_000
     assert content[4 + match.end() :].strip()
 

@@ -1,7 +1,7 @@
 ---
 name: autorunne-grill
 description: Use when a user wants to add, change, remove, or redesign a feature in an Autorunne-backed repo. Read Autorunne state first, identify the safe change boundary, ask only necessary questions, then implement and verify the smallest safe slice.
-version: 0.1.0
+version: 0.1.1
 author: Autorunne Grill contributors
 license: MIT
 metadata:

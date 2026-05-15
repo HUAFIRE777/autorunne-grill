@@ -40,7 +40,23 @@ If the repo uses Autorunne, those answers should come from `.autorunne/` first.
 
 ## Install
 
-### Option A: install from GitHub with the skills installer
+### Option A: install with pipx from PyPI
+
+Recommended public install path:
+
+```bash
+pipx install autorunne-grill
+autorunne-grill install
+```
+
+Or with pip:
+
+```bash
+python -m pip install autorunne-grill
+python -m autorunne_grill install
+```
+
+### Option B: install from GitHub with the skills installer
 
 If your agent supports the `skills` installer pattern:
 
@@ -50,20 +66,11 @@ npx skills@latest add HUAFIRE777/autorunne-grill
 
 Then select `autorunne-grill` for your coding agent if prompted.
 
-### Option B: install with pipx / pip
-
-This repo also ships a tiny Python installer CLI.
+### Option C: install directly from GitHub
 
 ```bash
 pipx install git+https://github.com/HUAFIRE777/autorunne-grill.git
 autorunne-grill install
-```
-
-Or with pip:
-
-```bash
-python -m pip install git+https://github.com/HUAFIRE777/autorunne-grill.git
-python -m autorunne_grill install
 ```
 
 This copies the skill to:
@@ -72,7 +79,7 @@ This copies the skill to:
 ~/.hermes/skills/productivity/autorunne-grill/SKILL.md
 ```
 
-### Option C: manual install
+### Option D: manual install
 
 ```bash
 mkdir -p ~/.hermes/skills/productivity/autorunne-grill
@@ -125,21 +132,21 @@ python -m pytest -q
 python -m build
 ```
 
-## PyPI status
+## PyPI
 
-The project is packaged so it can be published to PyPI later. PyPI publishing requires the maintainer to configure a PyPI trusted publisher for this GitHub repo first.
-
-Users do **not** need PyPI for one-line GitHub installation via:
-
-```bash
-npx skills@latest add HUAFIRE777/autorunne-grill
-```
-
-PyPI is useful if you want this install path:
+`autorunne-grill` is published on PyPI:
 
 ```bash
 pipx install autorunne-grill
 ```
+
+PyPI page:
+
+```text
+https://pypi.org/project/autorunne-grill/
+```
+
+GitHub and `npx skills@latest add HUAFIRE777/autorunne-grill` remain available as alternative install paths.
 
 ## License
 
