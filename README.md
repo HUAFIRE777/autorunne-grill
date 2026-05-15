@@ -49,6 +49,33 @@ pipx install autorunne-grill
 autorunne-grill install
 ```
 
+This installs the skill for your Hermes user profile:
+
+```text
+~/.hermes/skills/productivity/autorunne-grill/SKILL.md
+```
+
+If you want the skill copied into one specific Autorunne repo so Codex/Claude-style agents can see it from the project itself:
+
+```bash
+cd your-project
+autorunne open --path .
+autorunne-grill install --scope repo --repo .
+```
+
+This creates:
+
+```text
+.agents/skills/autorunne-grill/SKILL.md
+.claude/skills/autorunne-grill/SKILL.md
+```
+
+For both user-level and repo-local install:
+
+```bash
+autorunne-grill install --scope both --repo .
+```
+
 Or with pip:
 
 ```bash
@@ -93,10 +120,38 @@ Use this together with Autorunne:
 ```bash
 pipx install autorunne
 cd your-project
-autorunne open
+autorunne open --path .
+autorunne-grill install --scope repo --repo .
 ```
 
 After that, your AI agent can use `autorunne-grill` when you ask for feature changes.
+
+## How to use in real development
+
+A practical beginner workflow looks like this:
+
+1. Open your project folder.
+2. Run `autorunne open --path .` once to create or refresh project memory.
+3. Install `autorunne-grill` globally or into the repo.
+4. Tell the AI the product task in normal language.
+5. The AI should read Autorunne state, classify risk, make the smallest safe change, test it, and finish with Autorunne.
+
+Example prompt:
+
+```text
+用 autorunne-grill 帮我先看一下安全边界，然后把统计卡片展示到首页。改完跑测试，并记录到 Autorunne。
+```
+
+For a low-risk change, the agent should not waste time asking questions. It should produce a compact safety summary like:
+
+```text
+我先看了 Autorunne 状态：项目已准备好，上次测试通过，没有活跃任务。
+这次改动属于：普通功能改动。
+安全边界：只展示现有 /api/stats 数据。
+不会改：不改存储格式、不改 API 返回结构、不改提交线索流程。
+验证方式：python -m pytest -q。
+需要确认：无，我会按最小安全切片直接做。
+```
 
 ## Example
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "autorunne-grill"
-version = "0.1.1"
+version = "0.1.2"
 description = "Project-aware grill-me skill for safer Autorunne-backed feature changes."
 readme = "README.md"
 requires-python = ">=3.9"

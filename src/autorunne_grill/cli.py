@@ -8,6 +8,10 @@ from pathlib import Path
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 SKILL_RELATIVE = Path("skills/productivity/autorunne-grill/SKILL.md")
 DEFAULT_TARGET = Path.home() / ".hermes" / "skills" / "productivity" / "autorunne-grill" / "SKILL.md"
+REPO_AGENT_TARGETS = (
+    Path(".agents") / "skills" / "autorunne-grill" / "SKILL.md",
+    Path(".claude") / "skills" / "autorunne-grill" / "SKILL.md",
+)
 
 
 def _source_skill() -> Path:
@@ -30,7 +34,7 @@ def _source_skill() -> Path:
     raise FileNotFoundError("Could not locate autorunne-grill SKILL.md inside the package.")
 
 
-def install(target: Path = DEFAULT_TARGET, force: bool = True) -> Path:
+def _copy_skill(target: Path, force: bool = True) -> Path:
     src = _source_skill()
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
@@ -39,15 +43,30 @@ def install(target: Path = DEFAULT_TARGET, force: bool = True) -> Path:
     return target
 
 
+def install(target: Path = DEFAULT_TARGET, force: bool = True) -> Path:
+    return _copy_skill(target, force=force)
+
+
+def install_repo(repo: Path = Path("."), force: bool = True) -> list[Path]:
+    repo = repo.expanduser().resolve()
+    if not repo.exists():
+        raise FileNotFoundError(f"Repo path does not exist: {repo}")
+    if not (repo / ".autorunne").exists():
+        raise FileNotFoundError(f"Repo does not look Autorunne-backed yet: {repo} (missing .autorunne)")
+    return [_copy_skill(repo / relative, force=force) for relative in REPO_AGENT_TARGETS]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="autorunne-grill",
-        description="Install the autorunne-grill skill into a local Hermes skills directory.",
+        description="Install the autorunne-grill skill for user-level Hermes or repo-local agent handoff.",
     )
     sub = parser.add_subparsers(dest="command")
 
-    install_parser = sub.add_parser("install", help="Install SKILL.md into ~/.hermes/skills")
-    install_parser.add_argument("--target", type=Path, default=DEFAULT_TARGET, help="Target SKILL.md path")
+    install_parser = sub.add_parser("install", help="Install SKILL.md into ~/.hermes/skills or repo-local agent skill folders")
+    install_parser.add_argument("--scope", choices=["user", "repo", "both"], default="user", help="Install for the current user, the current repo, or both")
+    install_parser.add_argument("--repo", type=Path, default=Path("."), help="Repo path for --scope repo/both; must contain .autorunne")
+    install_parser.add_argument("--target", type=Path, default=None, help="Custom single SKILL.md path; implies --scope user-style single-target install")
     install_parser.add_argument("--no-force", action="store_true", help="Do not overwrite an existing skill")
 
     path_parser = sub.add_parser("path", help="Print the bundled source SKILL.md path")
@@ -57,11 +76,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "install":
         try:
-            target = install(args.target.expanduser(), force=not args.no_force)
+            installed: list[Path] = []
+            if args.target is not None:
+                installed.append(install(args.target.expanduser(), force=not args.no_force))
+            else:
+                if args.scope in {"user", "both"}:
+                    installed.append(install(DEFAULT_TARGET, force=not args.no_force))
+                if args.scope in {"repo", "both"}:
+                    installed.extend(install_repo(args.repo, force=not args.no_force))
         except Exception as exc:  # pragma: no cover - user-facing path
             print(f"autorunne-grill install failed: {exc}", file=sys.stderr)
             return 1
-        print(f"Installed autorunne-grill skill to {target}")
+        for target in installed:
+            print(f"Installed autorunne-grill skill to {target}")
         return 0
 
     if args.command == "path":

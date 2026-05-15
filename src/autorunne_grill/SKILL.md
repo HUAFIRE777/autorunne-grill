@@ -1,7 +1,7 @@
 ---
 name: autorunne-grill
 description: Use when a user wants to add, change, remove, or redesign a feature in an Autorunne-backed repo. Read Autorunne state first, identify the safe change boundary, ask only necessary questions, then implement and verify the smallest safe slice.
-version: 0.1.1
+version: 0.1.2
 author: Autorunne Grill contributors
 license: MIT
 metadata:
@@ -52,6 +52,18 @@ Do not grill the user from a blank slate.
 First read Autorunne state and the relevant code. Then ask the fewest questions needed to safely proceed.
 
 If a question can be answered by reading `.autorunne/`, generated views, tests, README, package files, routes, schema files, or existing code, answer it yourself instead of asking the user.
+
+## Installation Modes
+
+Prefer a repo-local install when the goal is to make one project carry the rule with it:
+
+```bash
+cd your-project
+autorunne open --path .
+autorunne-grill install --scope repo --repo .
+```
+
+This copies the skill to both `.agents/skills/autorunne-grill/SKILL.md` and `.claude/skills/autorunne-grill/SKILL.md` so direct-agent workflows can discover it from the repository. Use `autorunne-grill install --scope both --repo .` when you also want the user-level Hermes copy.
 
 ## Required Read Order
 

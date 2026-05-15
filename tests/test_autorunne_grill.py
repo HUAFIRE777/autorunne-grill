@@ -20,7 +20,7 @@ def test_skill_frontmatter_is_valid():
     assert fm["name"] == "autorunne-grill"
     assert "description" in fm
     assert len(fm["description"]) <= 1024
-    assert fm["version"] == "0.1.1"
+    assert fm["version"] == "0.1.2"
     assert len(content) <= 100_000
     assert content[4 + match.end() :].strip()
 
@@ -66,3 +66,37 @@ def test_cli_installs_skill_to_custom_target(tmp_path):
     installed = target.read_text(encoding="utf-8")
     assert "name: autorunne-grill" in installed
     assert "Required Read Order" in installed
+
+
+def test_cli_installs_repo_local_agent_skills(tmp_path):
+    repo = tmp_path / "demo"
+    (repo / ".autorunne").mkdir(parents=True)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill", "install", "--scope", "repo", "--repo", str(repo)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    agent_skill = repo / ".agents" / "skills" / "autorunne-grill" / "SKILL.md"
+    claude_skill = repo / ".claude" / "skills" / "autorunne-grill" / "SKILL.md"
+    assert agent_skill.exists()
+    assert claude_skill.exists()
+    assert "name: autorunne-grill" in agent_skill.read_text(encoding="utf-8")
+    assert "Installed autorunne-grill skill to" in result.stdout
+
+
+def test_cli_refuses_repo_scope_without_autorunne_state(tmp_path):
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill", "install", "--scope", "repo", "--repo", str(tmp_path)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "missing .autorunne" in result.stderr
