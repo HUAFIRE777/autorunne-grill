@@ -1,7 +1,7 @@
 ---
 name: autorunne-grill
 description: Use when a user wants to add, change, remove, or redesign a feature in an Autorunne-backed repo. Read Autorunne state first, identify the safe change boundary, ask only necessary questions, then implement and verify the smallest safe slice.
-version: 0.1.3
+version: 0.1.4
 author: Autorunne Grill contributors
 license: MIT
 metadata:
@@ -55,15 +55,15 @@ If a question can be answered by reading `.autorunne/`, generated views, tests, 
 
 ## Installation Modes
 
-Prefer a repo-local install when the goal is to make one project carry the rule with it:
+Prefer a repo-local install when the goal is to make one project carry the rule with it. In 0.1.4+, the short command auto-installs into the current Autorunne-backed repo:
 
 ```bash
 cd your-project
 autorunne open --path .
-autorunne-grill install --scope repo --repo .
+autorunne-grill
 ```
 
-This copies the skill/rule files to the repo so direct-agent workflows can discover them from the project:
+This is equivalent to the explicit command `autorunne-grill install --scope repo --repo .`. It copies the skill/rule files to the repo so direct-agent workflows can discover them from the project:
 
 ```text
 .agents/skills/autorunne-grill/SKILL.md

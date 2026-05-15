@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4
+
+- Added the short default command: running `autorunne-grill` inside an Autorunne-backed repo now auto-installs repo-local rules.
+- The short command writes `.agents/skills/autorunne-grill/SKILL.md`, `.claude/skills/autorunne-grill/SKILL.md`, and `.cursor/rules/autorunne-grill.mdc`.
+- If the current directory is not Autorunne-backed yet, the CLI now gives a clear `autorunne open --path .` hint instead of silently doing a user-level install.
+- Kept the explicit advanced command `autorunne-grill install --scope repo --repo .` for scripts and old docs.
+
 ## 0.1.3
 
 - Added one-command Cursor support for repo-local installs via `.cursor/rules/autorunne-grill.mdc`.

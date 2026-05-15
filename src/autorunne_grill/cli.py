@@ -130,10 +130,34 @@ def install_repo(repo: Path = Path("."), force: bool = True, include_cursor: boo
     return installed
 
 
+def _print_installed(installed: list[Path]) -> None:
+    for target in installed:
+        print(f"Installed autorunne-grill to {target}")
+
+
+def _auto_install_current_repo() -> int:
+    """Default CLI action: install repo-local rules into the current Autorunne repo."""
+    try:
+        installed = install_repo(Path("."), force=True, include_cursor=True)
+    except Exception as exc:  # pragma: no cover - user-facing path
+        print(f"autorunne-grill auto install failed: {exc}", file=sys.stderr)
+        print("Tip: run `autorunne open --path .` in your project first, then run `autorunne-grill` again.", file=sys.stderr)
+        return 1
+    print("Detected Autorunne project. Installing repo-local autorunne-grill rules...")
+    _print_installed(installed)
+    print("Ready: Codex-style agents, Claude Code, and Cursor can now read autorunne-grill from this repo.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if not argv:
+        return _auto_install_current_repo()
+
     parser = argparse.ArgumentParser(
         prog="autorunne-grill",
-        description="Install the autorunne-grill skill for user-level Hermes or repo-local agent handoff.",
+        description="Install the autorunne-grill skill for user-level Hermes or repo-local agent handoff. With no arguments, installs repo-local rules into the current Autorunne repo.",
     )
     sub = parser.add_subparsers(dest="command")
 
@@ -165,8 +189,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # pragma: no cover - user-facing path
             print(f"autorunne-grill install failed: {exc}", file=sys.stderr)
             return 1
-        for target in installed:
-            print(f"Installed autorunne-grill to {target}")
+        _print_installed(installed)
         return 0
 
     if args.command == "path":

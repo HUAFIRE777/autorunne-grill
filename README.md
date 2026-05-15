@@ -46,20 +46,19 @@ Recommended public install path:
 
 ```bash
 pipx install autorunne-grill
-autorunne-grill install
 ```
 
-This installs the skill for your Hermes user profile:
-
-```text
-~/.hermes/skills/productivity/autorunne-grill/SKILL.md
-```
-
-If you want the skill copied into one specific Autorunne repo so Codex/Claude-style agents can see it from the project itself:
+Then, inside one Autorunne-backed project, run the short command:
 
 ```bash
 cd your-project
 autorunne open --path .
+autorunne-grill
+```
+
+In 0.1.4+, `autorunne-grill` with no arguments automatically detects the current Autorunne repo and installs the repo-local skill/rules. It is equivalent to:
+
+```bash
 autorunne-grill install --scope repo --repo .
 ```
 
@@ -124,10 +123,30 @@ Use this together with Autorunne:
 pipx install autorunne
 cd your-project
 autorunne open --path .
-autorunne-grill install --scope repo --repo .
+autorunne-grill
 ```
 
 After that, your AI agent can use `autorunne-grill` when you ask for feature changes.
+
+## Stable 0.1.4 workflow
+
+For normal users, the stable path is now:
+
+```bash
+pipx install autorunne
+pipx install autorunne-grill
+cd your-project
+autorunne open --path .
+autorunne-grill
+```
+
+`autorunne-grill` does not modify random folders. It only auto-writes repo-local agent rules when the current project already has `.autorunne/`. If `.autorunne/` is missing, it stops and tells you to run `autorunne open --path .` first.
+
+For scripts or advanced setup, the old explicit command remains supported:
+
+```bash
+autorunne-grill install --scope repo --repo .
+```
 
 ## How to use in real development
 
@@ -135,7 +154,7 @@ A practical beginner workflow looks like this:
 
 1. Open your project folder.
 2. Run `autorunne open --path .` once to create or refresh project memory.
-3. Install `autorunne-grill` globally or into the repo.
+3. Run `autorunne-grill` once to auto-install repo-local Codex/Claude/Cursor rules.
 4. Tell the AI the product task in normal language.
 5. The AI should read Autorunne state, classify risk, make the smallest safe change, test it, and finish with Autorunne.
 

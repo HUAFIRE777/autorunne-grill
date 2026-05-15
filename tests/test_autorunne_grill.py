@@ -20,7 +20,7 @@ def test_skill_frontmatter_is_valid():
     assert fm["name"] == "autorunne-grill"
     assert "description" in fm
     assert len(fm["description"]) <= 1024
-    assert fm["version"] == "0.1.3"
+    assert fm["version"] == "0.1.4"
     assert len(content) <= 100_000
     assert content[4 + match.end() :].strip()
 
@@ -111,6 +111,40 @@ def test_cli_can_skip_cursor_rule(tmp_path):
     assert result.returncode == 0, result.stderr
     assert (repo / ".agents" / "skills" / "autorunne-grill" / "SKILL.md").exists()
     assert not (repo / ".cursor" / "rules" / "autorunne-grill.mdc").exists()
+
+
+def test_cli_no_args_auto_installs_current_autorunne_repo(tmp_path):
+    repo = tmp_path / "demo"
+    (repo / ".autorunne").mkdir(parents=True)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill"],
+        cwd=repo,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert (repo / ".agents" / "skills" / "autorunne-grill" / "SKILL.md").exists()
+    assert (repo / ".claude" / "skills" / "autorunne-grill" / "SKILL.md").exists()
+    assert (repo / ".cursor" / "rules" / "autorunne-grill.mdc").exists()
+    assert "Detected Autorunne project" in result.stdout
+    assert "Ready: Codex-style agents" in result.stdout
+
+
+def test_cli_no_args_refuses_non_autorunne_directory(tmp_path):
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill"],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "missing .autorunne" in result.stderr
+    assert "autorunne open --path ." in result.stderr
 
 
 def test_cli_path_repo_local_lists_cursor_rule():
