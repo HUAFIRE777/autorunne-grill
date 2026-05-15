@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "autorunne-grill"
+version = "0.1.0"
+description = "Project-aware grill-me skill for safer Autorunne-backed feature changes."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Autorunne Grill contributors" }]
+keywords = ["autorunne", "skills", "ai-agent", "grill-me", "developer-tools"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development",
+]
+
+[project.urls]
+Homepage = "https://github.com/HUAFIRE777/autorunne-grill"
+Repository = "https://github.com/HUAFIRE777/autorunne-grill"
+Issues = "https://github.com/HUAFIRE777/autorunne-grill/issues"
+
+[project.scripts]
+autorunne-grill = "autorunne_grill.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "build>=1.2", "twine>=5", "PyYAML>=6"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/autorunne_grill"]
+artifacts = ["skills/productivity/autorunne-grill/SKILL.md"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/autorunne_grill",
+  "skills/productivity/autorunne-grill/SKILL.md",
+  "tests",
+  "README.md",
+  "LICENSE",
+  "pyproject.toml",
+]
