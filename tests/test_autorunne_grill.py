@@ -20,7 +20,7 @@ def test_skill_frontmatter_is_valid():
     assert fm["name"] == "autorunne-grill"
     assert "description" in fm
     assert len(fm["description"]) <= 1024
-    assert fm["version"] == "0.1.2"
+    assert fm["version"] == "0.1.3"
     assert len(content) <= 100_000
     assert content[4 + match.end() :].strip()
 
@@ -68,7 +68,7 @@ def test_cli_installs_skill_to_custom_target(tmp_path):
     assert "Required Read Order" in installed
 
 
-def test_cli_installs_repo_local_agent_skills(tmp_path):
+def test_cli_installs_repo_local_agent_skills_and_cursor_rule(tmp_path):
     repo = tmp_path / "demo"
     (repo / ".autorunne").mkdir(parents=True)
 
@@ -83,10 +83,49 @@ def test_cli_installs_repo_local_agent_skills(tmp_path):
     assert result.returncode == 0, result.stderr
     agent_skill = repo / ".agents" / "skills" / "autorunne-grill" / "SKILL.md"
     claude_skill = repo / ".claude" / "skills" / "autorunne-grill" / "SKILL.md"
+    cursor_rule = repo / ".cursor" / "rules" / "autorunne-grill.mdc"
     assert agent_skill.exists()
     assert claude_skill.exists()
+    assert cursor_rule.exists()
     assert "name: autorunne-grill" in agent_skill.read_text(encoding="utf-8")
-    assert "Installed autorunne-grill skill to" in result.stdout
+    cursor_text = cursor_rule.read_text(encoding="utf-8")
+    assert cursor_text.startswith("---\n")
+    assert "alwaysApply: false" in cursor_text
+    assert "autorunne ingest --source cursor" in cursor_text
+    assert ".autorunne/views/STATUS.md" in cursor_text
+    assert "Installed autorunne-grill to" in result.stdout
+
+
+def test_cli_can_skip_cursor_rule(tmp_path):
+    repo = tmp_path / "demo"
+    (repo / ".autorunne").mkdir(parents=True)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill", "install", "--scope", "repo", "--repo", str(repo), "--no-cursor"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert (repo / ".agents" / "skills" / "autorunne-grill" / "SKILL.md").exists()
+    assert not (repo / ".cursor" / "rules" / "autorunne-grill.mdc").exists()
+
+
+def test_cli_path_repo_local_lists_cursor_rule():
+    result = subprocess.run(
+        [sys.executable, "-m", "autorunne_grill", "path", "--repo-local"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert ".agents/skills/autorunne-grill/SKILL.md" in result.stdout
+    assert ".claude/skills/autorunne-grill/SKILL.md" in result.stdout
+    assert ".cursor/rules/autorunne-grill.mdc" in result.stdout
 
 
 def test_cli_refuses_repo_scope_without_autorunne_state(tmp_path):

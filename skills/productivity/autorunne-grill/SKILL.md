@@ -1,7 +1,7 @@
 ---
 name: autorunne-grill
 description: Use when a user wants to add, change, remove, or redesign a feature in an Autorunne-backed repo. Read Autorunne state first, identify the safe change boundary, ask only necessary questions, then implement and verify the smallest safe slice.
-version: 0.1.2
+version: 0.1.3
 author: Autorunne Grill contributors
 license: MIT
 metadata:
@@ -63,7 +63,15 @@ autorunne open --path .
 autorunne-grill install --scope repo --repo .
 ```
 
-This copies the skill to both `.agents/skills/autorunne-grill/SKILL.md` and `.claude/skills/autorunne-grill/SKILL.md` so direct-agent workflows can discover it from the repository. Use `autorunne-grill install --scope both --repo .` when you also want the user-level Hermes copy.
+This copies the skill/rule files to the repo so direct-agent workflows can discover them from the project:
+
+```text
+.agents/skills/autorunne-grill/SKILL.md
+.claude/skills/autorunne-grill/SKILL.md
+.cursor/rules/autorunne-grill.mdc
+```
+
+Cursor support uses a repo-local `.mdc` rule. It is not a separate plugin: it is a project rule that tells Cursor to read Autorunne state first, define the safe boundary, and record the work with `autorunne ingest --source cursor` and `autorunne finish`. Use `autorunne-grill install --scope both --repo .` when you also want the user-level Hermes copy.
 
 ## Required Read Order
 
@@ -186,13 +194,14 @@ Treat these as internal workflow steps. Do not ask the user whether to run routi
 
 1. Read state before questions.
 2. Read relevant code before questions when code can answer the question.
-3. Prefer the smallest safe slice.
-4. Do not overwrite existing product decisions without calling out the conflict.
-5. Preserve currently working flows.
-6. Add or update tests when a behavior changes.
-7. Run the most relevant validation command before finishing.
-8. Record the result in Autorunne after validation.
-9. Report changed files, validation result, and Autorunne commands at the end.
+3. Produce the compact safety summary before editing files unless the change is a trivial typo.
+4. Prefer the smallest safe slice.
+5. Do not overwrite existing product decisions without calling out the conflict.
+6. Preserve currently working flows.
+7. Add or update tests when a behavior changes.
+8. Run the most relevant validation command before finishing.
+9. Record the result in Autorunne after validation.
+10. Report changed files, validation result, and Autorunne commands at the end.
 
 ## Handling Missing or Weak Autorunne State
 

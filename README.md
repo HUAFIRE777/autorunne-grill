@@ -63,12 +63,15 @@ autorunne open --path .
 autorunne-grill install --scope repo --repo .
 ```
 
-This creates:
+This creates agent instructions for Codex-style agents, Claude Code, and Cursor:
 
 ```text
 .agents/skills/autorunne-grill/SKILL.md
 .claude/skills/autorunne-grill/SKILL.md
+.cursor/rules/autorunne-grill.mdc
 ```
+
+Cursor support is repo-local: the installer writes a Cursor rule that tells Cursor to read `.autorunne/` first, classify the change, state the safe boundary, and record the result with `autorunne ingest --source cursor` / `autorunne finish`.
 
 For both user-level and repo-local install:
 
@@ -152,6 +155,18 @@ For a low-risk change, the agent should not waste time asking questions. It shou
 验证方式：python -m pytest -q。
 需要确认：无，我会按最小安全切片直接做。
 ```
+
+## Agent support
+
+Repo-local install now covers the main coding-agent entry files:
+
+| Agent | Installed file |
+| --- | --- |
+| Codex-style agents | `.agents/skills/autorunne-grill/SKILL.md` |
+| Claude Code | `.claude/skills/autorunne-grill/SKILL.md` |
+| Cursor | `.cursor/rules/autorunne-grill.mdc` |
+
+The Cursor rule is deliberately small and practical. It tells Cursor to read `.autorunne/` first, avoid questions the repo can answer, make the smallest safe slice, run validation, and record the work back through Autorunne.
 
 ## Example
 
